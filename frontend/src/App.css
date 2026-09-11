@@ -1,0 +1,806 @@
+
+/* =========================================================
+   GLOBAL
+========================================================= */
+
+html {
+  scroll-behavior: smooth;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+
+/* =========================================================
+   NAVBAR LOGIN BUTTON
+========================================================= */
+
+.login-btn {
+  display: inline-block;
+
+  padding: 9px 20px;
+
+  border-radius: 999px;
+
+  background-color: #ffffff;
+  color: #000000;
+
+  border: 1px solid #ffffff;
+
+  font-size: 0.9rem;
+  font-weight: 600;
+
+  text-decoration: none;
+
+  margin-left: 80px;
+
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.login-btn:hover {
+  background-color: #000000;
+  color: #ffffff;
+
+  border-color: #ffffff;
+
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 6px 14px rgba(255, 255, 255, 0.15);
+}
+
+.login-btn:active {
+  transform: translateY(0);
+}
+
+
+/* Mobile */
+
+@media (max-width: 991px) {
+  .login-btn {
+    margin-left: 0;
+    margin-top: 5px;
+  }
+}
+
+
+
+/* =========================================================
+   AUTH PAGE
+========================================================= */
+
+.auth-page {
+  min-height: 75vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 50px 20px;
+
+  background-color: #f8f8f8;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 430px;
+
+  background-color: #ffffff;
+
+  padding: 40px;
+
+  border-radius: 16px;
+
+  box-shadow:
+    0 10px 35px rgba(0, 0, 0, 0.08);
+}
+
+.auth-card .form-control {
+  padding: 11px 14px;
+
+  border: 1px solid #dee2e6;
+
+  border-radius: 8px;
+}
+
+.auth-card .form-control:focus {
+  border-color: #000000;
+
+  box-shadow:
+    0 0 0 0.15rem rgba(0, 0, 0, 0.08);
+}
+
+.auth-card .btn-dark {
+  border-radius: 8px;
+
+  transition:
+    background-color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.auth-card .btn-dark:hover {
+  background-color: #222222;
+
+  transform: translateY(-1px);
+}
+
+
+
+
+
+
+
+
+/* =========================================================
+   PRODUCT CARD
+========================================================= */
+
+.custom-store-card {
+  display: flex;
+  flex-direction: column;
+
+  width: 260px;
+  height: 360px;
+
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 14px;
+
+  background: #ffffff;
+
+  overflow: hidden;
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+  transform: translateY(0);
+
+  transition:
+    transform 0.35s ease,
+    box-shadow 0.35s ease,
+    border-color 0.35s ease;
+}
+
+
+/* Card hover */
+
+.custom-store-card:hover {
+  transform: translateY(-10px);
+
+  box-shadow:
+    0 18px 35px rgba(0, 0, 0, 0.12);
+
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+
+/* =========================================================
+   PRODUCT IMAGE BOX
+========================================================= */
+
+.custom-img-box {
+  height: 160px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 3px;
+  margin: 12px 12px 0 12px;
+
+  background-color: #f0f0f0;
+
+  border-radius: 10px;
+
+  overflow: hidden;
+
+  transition:
+    background-color 0.35s ease,
+    transform 0.35s ease;
+}
+
+
+.custom-store-card:hover .custom-img-box {
+  background-color: #e9e9e9;
+}
+
+
+/* Product image */
+
+.custom-product-img {
+  height: 120px;
+  width: 120px;
+
+  object-fit: contain;
+
+  transform: scale(1);
+
+  transition:
+    transform 0.45s ease;
+}
+
+
+/* Image zoom on card hover */
+
+.custom-store-card:hover .custom-product-img {
+  transform: scale(1.1);
+}
+
+
+/* =========================================================
+   CARD BODY
+========================================================= */
+
+.custom-card-body {
+  display: flex;
+  flex-direction: column;
+
+  padding: 14px 16px 16px 16px;
+
+  flex-grow: 1;
+}
+
+
+/* =========================================================
+   PRODUCT TITLE
+========================================================= */
+
+.custom-card-title {
+  font-size: 1rem;
+  font-weight: 700;
+
+  color: #000000;
+
+  line-height: 1.3;
+
+  margin-bottom: 2px !important;
+
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  height: 2.6rem;
+
+  transition:
+    transform 0.3s ease,
+    color 0.3s ease;
+}
+
+
+.custom-store-card:hover .custom-card-title {
+  transform: translateY(-2px);
+}
+
+
+/* =========================================================
+   PRICE
+========================================================= */
+
+.custom-card-price {
+  font-size: 1.15rem;
+  font-weight: 700;
+
+  color: #007bff;
+
+  text-align: center;
+
+  margin-top: 0;
+  margin-bottom: 4px !important;
+
+  transition:
+    transform 0.3s ease,
+    color 0.3s ease;
+}
+
+
+.custom-store-card:hover .custom-card-price {
+  transform: scale(1.04);
+}
+
+
+/* =========================================================
+   PRODUCT BUTTON
+========================================================= */
+
+.custom-btn-wrapper {
+  width: 100%;
+
+  margin-top: auto;
+}
+
+
+.custom-btn-primary {
+  display: block;
+
+  width: 100%;
+
+  padding: 10px;
+
+  text-align: center;
+
+  border-radius: 8px;
+
+  font-weight: 600;
+  font-size: 0.9rem;
+
+  background-color: #000000;
+  color: #ffffff;
+
+  text-decoration: none;
+
+  border: none;
+
+  transform: translateY(0);
+
+  transition:
+    background-color 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+
+.custom-btn-primary:hover {
+  background-color: #222222;
+
+  color: #ffffff;
+
+  transform: translateY(-3px);
+
+  box-shadow:
+    0 7px 15px rgba(0, 0, 0, 0.18);
+}
+
+
+.custom-btn-primary:active {
+  transform: translateY(0);
+
+  box-shadow: none;
+}
+
+
+/* =========================================================
+   PRODUCT DETAILS PAGE
+========================================================= */
+
+.custom-detail-loader {
+  text-align: center;
+
+  padding: 100px 0;
+
+  animation: detailFadeIn 0.5s ease;
+}
+
+
+.custom-detail-loader .spinner-border {
+  width: 3rem;
+  height: 3rem;
+
+  color: #000000 !important;
+}
+
+
+/* =========================================================
+   DETAIL IMAGE
+========================================================= */
+
+.custom-detail-img-box {
+  width: 100%;
+  max-width: 420px;
+
+  height: 380px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  border-radius: 16px;
+
+  animation: detailImageEnter 0.7s ease both;
+}
+
+
+.custom-detail-img {
+  max-height: 280px;
+  max-width: 100%;
+
+  object-fit: contain;
+
+  transition:
+    transform 0.45s ease,
+    filter 0.45s ease;
+}
+
+
+.custom-detail-img-box:hover .custom-detail-img {
+  transform: scale(1.06);
+
+  filter:
+    drop-shadow(0 15px 20px rgba(0, 0, 0, 0.12));
+}
+
+
+/* =========================================================
+   DETAIL CONTENT
+========================================================= */
+
+.custom-detail-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  animation: detailContentEnter 0.7s ease both;
+}
+
+
+/* Category */
+
+.custom-detail-badge {
+  background-color: #e2e8f0;
+
+  color: #4a5568;
+
+  padding: 6px 14px;
+
+  border-radius: 20px;
+
+  font-size: 0.8rem;
+  font-weight: 600;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.5px;
+
+  margin-bottom: 14px;
+
+  transition:
+    transform 0.25s ease,
+    background-color 0.25s ease;
+}
+
+
+.custom-detail-badge:hover {
+  transform: translateY(-2px);
+
+  background-color: #d8dee8;
+}
+
+
+/* Detail title */
+
+.custom-detail-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+
+  color: #000000;
+
+  line-height: 1.3;
+
+  margin-bottom: 10px;
+
+  transition:
+    transform 0.3s ease;
+}
+
+
+.custom-detail-title:hover {
+  transform: translateX(4px);
+}
+
+
+/* Rating */
+
+.custom-detail-rating {
+  font-size: 0.95rem;
+  font-weight: 600;
+
+  color: #1a202c;
+
+  margin-bottom: 16px;
+
+  transition:
+    transform 0.25s ease;
+}
+
+
+.custom-detail-rating:hover {
+  transform: translateX(3px);
+}
+
+
+/* Price */
+
+.custom-detail-price {
+  font-size: 1.75rem;
+  font-weight: 700;
+
+  color: #007bff;
+
+  margin-bottom: 18px;
+
+  transition:
+    transform 0.3s ease;
+}
+
+
+.custom-detail-price:hover {
+  transform: scale(1.04);
+}
+
+
+/* Description */
+
+.custom-detail-desc {
+  font-size: 1rem;
+
+  color: #4a5568;
+
+  line-height: 1.6;
+
+  margin-bottom: 24px;
+}
+
+
+/* =========================================================
+   DETAIL BUTTONS
+========================================================= */
+
+.custom-detail-btn-group {
+  display: flex;
+
+  gap: 12px;
+
+  width: 100%;
+
+  max-width: 450px;
+}
+
+
+/* Add to cart */
+
+.custom-btn-outline {
+  flex: 1;
+
+  padding: 12px;
+
+  border-radius: 10px;
+
+  font-weight: 600;
+  font-size: 0.95rem;
+
+  background-color: transparent;
+
+  color: #000000;
+
+  border: 2px solid #000000;
+
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+
+.custom-btn-outline:hover {
+  background-color: #000000;
+
+  color: #ffffff;
+
+  transform: translateY(-3px);
+
+  box-shadow:
+    0 7px 15px rgba(0, 0, 0, 0.15);
+}
+
+
+.custom-btn-outline:active {
+  transform: translateY(0);
+
+  box-shadow: none;
+}
+
+
+/* Buy now */
+
+.custom-btn-filled {
+  flex: 1;
+
+  padding: 12px;
+
+  border-radius: 10px;
+
+  font-weight: 600;
+  font-size: 0.95rem;
+
+  background-color: #000000;
+
+  color: #ffffff;
+
+  border: none;
+
+  transition:
+    background-color 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+
+.custom-btn-filled:hover {
+  background-color: #222222;
+
+  transform: translateY(-3px);
+
+  box-shadow:
+    0 7px 15px rgba(0, 0, 0, 0.18);
+}
+
+
+.custom-btn-filled:active {
+  transform: translateY(0);
+
+  box-shadow: none;
+}
+
+
+/* =========================================================
+   PAGE / CONTENT ANIMATIONS
+========================================================= */
+
+@keyframes detailFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+
+@keyframes detailImageEnter {
+  from {
+    opacity: 0;
+    transform: translateX(-35px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+
+@keyframes detailContentEnter {
+  from {
+    opacity: 0;
+    transform: translateX(35px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 992px) {
+
+  .custom-store-card {
+    width: 250px;
+  }
+
+  .custom-detail-img-box {
+    height: 340px;
+  }
+
+  .custom-detail-title {
+    font-size: 1.6rem;
+  }
+
+  .custom-detail-price {
+    font-size: 1.55rem;
+  }
+}
+
+
+@media (max-width: 768px) {
+
+  .custom-store-card {
+    width: 100%;
+    max-width: 280px;
+  }
+
+  .custom-detail-img-box {
+    max-width: 100%;
+    height: 320px;
+  }
+
+  .custom-detail-body {
+    margin-top: 10px;
+  }
+}
+
+
+@media (max-width: 576px) {
+
+  .custom-store-card {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .custom-img-box {
+    height: 160px;
+  }
+
+  .custom-product-img {
+    height: 115px;
+    width: 115px;
+  }
+
+  .custom-detail-img-box {
+    height: 280px;
+    padding: 10px;
+  }
+
+  .custom-detail-img {
+    max-height: 230px;
+  }
+
+  .custom-detail-title {
+    font-size: 1.45rem;
+  }
+
+  .custom-detail-price {
+    font-size: 1.45rem;
+  }
+
+  .custom-detail-btn-group {
+    flex-direction: column;
+  }
+
+  .custom-btn-outline,
+  .custom-btn-filled {
+    width: 100%;
+  }
+}
+
+
+/* =========================================================
+   ACCESSIBILITY
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
