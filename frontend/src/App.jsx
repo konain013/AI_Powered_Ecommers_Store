@@ -11,7 +11,7 @@ import Contact from "./pages/Contact";
 import ProductDetails from "./pages/ProductDetails";
 import Cart from "./pages/Cart";
 import Login from "./pages/Login";
-import SignUp from "./pages/SignUp";
+import SignUp from "./pages/SignUP";
 import { CartProvider } from "./context/CartContext";
 
 const App = () => {
