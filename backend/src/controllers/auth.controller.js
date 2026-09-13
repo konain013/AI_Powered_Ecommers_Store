@@ -1,10 +1,16 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 
+const {
+  sendPasswordResetEmail,
+} = require("../services/email.service");
 const User = require("../models/user");
 const { 
   signupSchema,
-  loginSchema
+  loginSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema
 
  } = require("../validators/auth.validators");
 
@@ -130,10 +136,153 @@ const login = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+}; 
+
+const forgotPassword = async (req, res, next) => {
+  try {
+    const validationResult = forgotPasswordSchema.safeParse(req.body);
+
+    if (!validationResult.success) {
+      return res.status(400).json({
+        success: false,
+        message: "Validation failed",
+        errors: validationResult.error.issues.map((issue) => ({
+          field: issue.path.join("."),
+          message: issue.message,
+        })),
+      });
+    }
+
+    const { email } = validationResult.data;
+
+    const user = await User.findOne({ email });
+
+    // Same response whether the email exists or not.
+    // Prevents account/email enumeration.
+    if (!user) {
+      return res.status(200).json({
+        success: true,
+        message:
+          "If an account exists for this email, a password reset link has been sent.",
+      });
+    }
+
+    // Generate raw token
+    const rawToken = crypto.randomBytes(32).toString("hex");
+
+    // Store only hashed token in database
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(rawToken)
+      .digest("hex");
+
+    // Token expires in 10 minutes
+    const resetPasswordExpires = new Date(
+      Date.now() + 10 * 60 * 1000
+    );
+
+    user.resetPasswordToken = hashedToken;
+    user.resetPasswordExpires = resetPasswordExpires;
+
+    await user.save();
+
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${rawToken}`;
+
+    try {
+      await sendPasswordResetEmail({
+        to: user.email,
+        resetUrl,
+      });
+    } catch (emailError) {
+      // Roll back reset token if email fails
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpires = undefined;
+
+      await user.save();
+
+      throw emailError;
+    }
+
+    return res.status(200).json({
+      success: true,
+      message:
+        "If an account exists for this email, a password reset link has been sent.",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const resetPassword = async (req, res, next) => {
+  try {
+    const validationResult = resetPasswordSchema.safeParse(req.body);
+
+    if (!validationResult.success) {
+      return res.status(400).json({
+        success: false,
+        message: "Validation failed",
+        errors: validationResult.error.issues.map((issue) => ({
+          field: issue.path.join("."),
+          message: issue.message,
+        })),
+      });
+    }
+
+    const { token, newPassword } = validationResult.data;
+
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
+
+    const user = await User.findOne({
+      resetPasswordToken: hashedToken,
+      resetPasswordExpires: { $gt: new Date() },
+    }).select("+password +resetPasswordToken +resetPasswordExpires");
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid or expired password reset token",
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+    user.password = hashedPassword;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Password reset successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+// test middleware
+const getMe = async (req, res) => {
+  return res.status(200).json({
+    success: true,
+    user: {
+      id: req.user._id,
+      name: req.user.name,
+      email: req.user.email,
+      role: req.user.role,
+    },
+  });
 };
 
 module.exports = {
   signup,
   login,
+  forgotPassword,
+  resetPassword,
+  getMe
 };
 
