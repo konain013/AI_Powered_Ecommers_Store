@@ -12,6 +12,7 @@ import ProductDetails from "./pages/ProductDetails";
 import Cart from "./pages/Cart";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUP";
+import ForgotPassword from "./pages/ForgotPassword";
 import { CartProvider } from "./context/CartContext";
 
 const App = () => {
@@ -29,6 +30,7 @@ const App = () => {
             <Route path="/cart" element={<Cart />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
+            <Route path="/forgot-password" element={<ForgotPassword />}/>
             
           </Routes>
         </main>
