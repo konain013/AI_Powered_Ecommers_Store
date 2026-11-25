@@ -13,6 +13,11 @@ const {
   resetPasswordSchema
 
  } = require("../validators/auth.validators");
+const {
+  isAccountLocked,
+  recordFailedAttempt,
+  resetFailedAttempts,
+} = require("../services/loginAttemptService");
 
 const signup = async (req, res, next) => {
   try {
@@ -76,8 +81,12 @@ const signup = async (req, res, next) => {
   }
 };
 
+
+
+
 const login = async (req, res, next) => {
   try {
+    // Validate request body
     const validationResult = loginSchema.safeParse(req.body);
 
     if (!validationResult.success) {
@@ -92,26 +101,53 @@ const login = async (req, res, next) => {
     }
 
     const { email, password } = validationResult.data;
+    const normalizedEmail = email.trim().toLowerCase();
 
-    const user = await User.findOne({ email }).select("+password");
+    // Check account lock
+    const isLocked = await isAccountLocked(normalizedEmail);
 
-    
+    if (isLocked) {
+      return res.status(429).json({
+        success: false,
+        message: "Too many failed login attempts. Please try again later.",
+      });
+    }
+
+    // Find user
+    const user = await User.findOne({
+      email: normalizedEmail,
+    }).select("+password");
+
+    // Handle unknown email
     if (!user) {
+      await recordFailedAttempt(normalizedEmail);
+
       return res.status(401).json({
         success: false,
         message: "Invalid email or password",
       });
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    // Verify password
+    const isPasswordValid = await bcrypt.compare(
+      password,
+      user.password
+    );
 
+    // Handle incorrect password
     if (!isPasswordValid) {
+      await recordFailedAttempt(normalizedEmail);
+
       return res.status(401).json({
         success: false,
         message: "Invalid email or password",
       });
     }
 
+    // Reset failed attempts after successful login
+    await resetFailedAttempts(normalizedEmail);
+
+    // Generate JWT
     const token = jwt.sign(
       {
         userId: user._id.toString(),
@@ -136,7 +172,10 @@ const login = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-}; 
+};
+
+
+
 
 const forgotPassword = async (req, res, next) => {
   try {
