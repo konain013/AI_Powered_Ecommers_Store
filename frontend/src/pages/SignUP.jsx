@@ -168,14 +168,14 @@ const SignUp = () => {
 
             {password.length > 0 && (
               <div className="d-flex flex-wrap gap-2 mt-2 small">
-                <Requirement valid={hasUppercase}>Uppercase</Requirement>
-                <Requirement valid={hasLowercase}>Lowercase</Requirement>
-                <Requirement valid={hasNumber}>Number</Requirement>
+                <Requirement valid={hasUppercase}>(A-Z)</Requirement>
+                <Requirement valid={hasLowercase}>(a-z)</Requirement>
+                <Requirement valid={hasNumber}>(0-9)</Requirement>
                 <Requirement valid={hasSpecialCharacter}>
-                  Special character
+                  (@,#,$,%)
                 </Requirement>
-                <Requirement valid={hasMinLength}>Min 8 characters</Requirement>
-                <Requirement valid={hasMaxLength}>Max 15 characters</Requirement>
+                <Requirement valid={hasMinLength}>Min 8 length</Requirement>
+                {/* <Requirement valid={hasMaxLength}>Max 15 characters</Requirement> */}
               </div>
             )}
           </div>
