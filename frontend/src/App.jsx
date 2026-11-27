@@ -15,6 +15,9 @@ import Login from "./pages/Login";
 import SignUp from "./pages/SignUP";
 import ForgotPassword from "./pages/ForgotPassword";
 import { CartProvider } from "./context/CartContext";
+import OrderDetails from "./pages/OrderDetails";
+import MyOrders from "./pages/Myorders";
+
 
 const App = () => {
   return (
@@ -32,6 +35,8 @@ const App = () => {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/order-details/:id" element={<OrderDetails/>}/>
+            <Route path="/my-orders" element={<MyOrders />} />
           </Routes>
         </main>
 

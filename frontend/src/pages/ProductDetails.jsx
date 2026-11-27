@@ -1,7 +1,9 @@
 
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import { useCart } from "../context/CartContext";
+import api from "../services/api";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -11,6 +13,7 @@ const ProductDetails = () => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [actionLoading, setActionLoading] = useState("");
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -19,7 +22,7 @@ const ProductDetails = () => {
         setError("");
 
         const response = await fetch(
-          `https://fakestoreapi.com/products/${id}`
+          `https://dummyjson.com/products/${id}`
         );
 
         if (!response.ok) {
@@ -29,7 +32,7 @@ const ProductDetails = () => {
         const data = await response.json();
         setProduct(data);
       } catch (error) {
-        console.error(error);
+        console.error("Product fetch error:", error);
         setError("Unable to load this product.");
       } finally {
         setLoading(false);
@@ -39,17 +42,62 @@ const ProductDetails = () => {
     fetchProduct();
   }, [id]);
 
-  const handleAddToCart = () => {
-    if (!product) return;
+  const handleAddToCart = async () => {
+    if (!product || actionLoading) return;
 
-    addToCart(product);
+    try {
+      setActionLoading("cart");
+
+      await addToCart(product);
+
+      toast.success("Product added to cart!");
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+        error.message ||
+        "Unable to add product to cart."
+      );
+    } finally {
+      setActionLoading("");
+    }
   };
 
-  const handleBuyNow = () => {
-    if (!product) return;
+  const handleBuyNow = async () => {
+    if (!product || actionLoading) return;
 
-    addToCart(product);
-    navigate("/cart");
+    if (!localStorage.getItem("token")) {
+      toast.error("Please login before placing an order.");
+      navigate("/login");
+      return;
+    }
+
+    try {
+      setActionLoading("buy");
+
+      const response = await api.post("/orders", {
+        items: [
+          {
+            productId: Number(product.id),
+            quantity: 1,
+          },
+        ],
+      });
+
+      toast.success("Order placed successfully!");
+
+      const orderId = response.data.order._id;
+
+      navigate(`/order-details/${orderId}`);
+    } catch (error) {
+      console.error("Buy now error:", error);
+
+      toast.error(
+        error.response?.data?.message ||
+        "Unable to place your order."
+      );
+    } finally {
+      setActionLoading("");
+    }
   };
 
   if (loading) {
@@ -69,7 +117,9 @@ const ProductDetails = () => {
   if (error) {
     return (
       <div className="container py-5 text-center">
-        <h3 className="fw-bold mb-3">Something went wrong</h3>
+        <h3 className="fw-bold mb-3">
+          Something went wrong
+        </h3>
 
         <p className="text-muted mb-4">
           {error}
@@ -85,16 +135,14 @@ const ProductDetails = () => {
     );
   }
 
-  if (!product) {
-    return null;
-  }
+  if (!product) return null;
 
   return (
     <div className="container py-5">
       <div className="row align-items-center g-5">
         <div className="col-lg-6 text-center">
           <img
-            src={product.image}
+            src={product.thumbnail || product.images?.[0]}
             alt={product.title}
             className="img-fluid"
             style={{
@@ -121,13 +169,10 @@ const ProductDetails = () => {
             {product.description}
           </p>
 
-          {product.rating && (
+          {product.rating !== undefined && (
             <p className="mb-4">
               <strong>Rating:</strong>{" "}
-              {product.rating.rate} / 5{" "}
-              <span className="text-muted">
-                ({product.rating.count} reviews)
-              </span>
+              {product.rating} / 5
             </p>
           )}
 
@@ -135,15 +180,21 @@ const ProductDetails = () => {
             <button
               className="btn btn-outline-dark px-4 py-2"
               onClick={handleAddToCart}
+              disabled={!!actionLoading}
             >
-              Add to Cart
+              {actionLoading === "cart"
+                ? "Adding..."
+                : "Add to Cart"}
             </button>
 
             <button
               className="btn btn-dark px-4 py-2"
               onClick={handleBuyNow}
+              disabled={!!actionLoading}
             >
-              Buy Now
+              {actionLoading === "buy"
+                ? "Processing..."
+                : "Buy Now"}
             </button>
           </div>
         </div>
@@ -153,4 +204,3 @@ const ProductDetails = () => {
 };
 
 export default ProductDetails;
-

@@ -57,6 +57,11 @@ const Navbar = () => {
                 )}{" "}
               </NavLink>{" "}
             </li>
+            <li className="nav-item">
+              <NavLink className="nav-link px-2" to="/my-orders">
+                MyOrder
+              </NavLink>
+            </li>
 
             <li className="nav-item">
               <Link to="/login" className="navbar-action-btn login-btn">

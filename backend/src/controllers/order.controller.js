@@ -1,11 +1,11 @@
 
+const mongoose = require("mongoose");
 const Order = require("../models/order");
 
 const createOrder = async (req, res) => {
   try {
     const { items } = req.body;
 
-    // Validate order items
     if (!Array.isArray(items) || items.length === 0) {
       return res.status(400).json({
         success: false,
@@ -13,7 +13,6 @@ const createOrder = async (req, res) => {
       });
     }
 
-    // Validate product IDs and quantities
     for (const item of items) {
       if (
         !Number.isInteger(item.productId) ||
@@ -29,7 +28,6 @@ const createOrder = async (req, res) => {
       }
     }
 
-    // Fetch and verify products from DummyJSON
     const orderItems = await Promise.all(
       items.map(async (item) => {
         const response = await fetch(
@@ -52,14 +50,12 @@ const createOrder = async (req, res) => {
       })
     );
 
-    // Calculate total on backend
     const totalAmount = orderItems.reduce(
       (total, item) =>
         total + item.priceAtPurchase * item.quantity,
       0
     );
 
-    // Save order in MongoDB
     const order = await Order.create({
       user: req.user._id,
       items: orderItems,
@@ -81,6 +77,67 @@ const createOrder = async (req, res) => {
   }
 };
 
+// Get specific order
+const getOrderById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid order ID",
+      });
+    }
+
+    const order = await Order.findOne({
+      _id: id,
+      user: req.user._id,
+    });
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      order,
+    });
+  } catch (error) {
+    console.error("Get order error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to fetch order",
+    });
+  }
+};
+
+// Get logged-in user's all orders
+const getMyOrders = async (req, res) => {
+  try {
+    const orders = await Order.find({
+      user: req.user._id,
+    }).sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      orders,
+    });
+  } catch (error) {
+    console.error("Get my orders error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to fetch orders",
+    });
+  }
+};
+
 module.exports = {
   createOrder,
+  getOrderById,
+  getMyOrders
 };

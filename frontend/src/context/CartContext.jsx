@@ -1,70 +1,35 @@
+
 import React, {
   createContext,
   useContext,
   useEffect,
   useMemo,
   useReducer,
+  useCallback,
 } from "react";
 
-const CartContext = createContext(null);
+import api from "../services/api";
 
-const CART_STORAGE_KEY = "e-store-cart";
+const CartContext = createContext(null);
 
 const initialState = {
   items: [],
 };
 
-const getInitialState = () => {
-  try {
-    const savedCart = localStorage.getItem(CART_STORAGE_KEY);
-
-    return savedCart ? JSON.parse(savedCart) : initialState;
-  } catch {
-    return initialState;
-  }
-};
-
 const cartReducer = (state, action) => {
   switch (action.type) {
-    case "ADD_ITEM": {
-      const product = action.payload;
-
-      const existingItem = state.items.find(
-        (item) => item.id === product.id
-      );
-
-      if (existingItem) {
-        return {
-          ...state,
-          items: state.items.map((item) =>
-            item.id === product.id
-              ? { ...item, quantity: item.quantity + 1 }
-              : item
-          ),
-        };
-      }
-
+    case "SET_CART":
       return {
         ...state,
-        items: [
-          ...state.items,
-          {
-            id: product.id,
-            title: product.title,
-            price: Number(product.price),
-            image: product.image,
-            category: product.category,
-            quantity: 1,
-          },
-        ],
+        items: action.payload,
       };
-    }
 
     case "INCREASE_QUANTITY":
       return {
         ...state,
         items: state.items.map((item) =>
-          item.id === action.payload
+          item.id === action.payload &&
+          item.quantity < 100
             ? { ...item, quantity: item.quantity + 1 }
             : item
         ),
@@ -98,27 +63,74 @@ const cartReducer = (state, action) => {
   }
 };
 
+const mapCartItems = (items = []) =>
+  items.map((item) => ({
+    id: item.productId,
+    title: item.productName,
+    price: Number(item.price),
+    image: item.thumbnail,
+    quantity: item.quantity,
+  }));
+
 export const CartProvider = ({ children }) => {
   const [state, dispatch] = useReducer(
     cartReducer,
-    initialState,
-    getInitialState
+    initialState
   );
 
-  useEffect(() => {
-    localStorage.setItem(
-      CART_STORAGE_KEY,
-      JSON.stringify(state)
-    );
-  }, [state]);
+  // Fetch cart from backend
+  const fetchCart = useCallback(async () => {
+    if (!localStorage.getItem("token")) {
+      dispatch({ type: "CLEAR_CART" });
+      return;
+    }
 
-  const addToCart = (product) => {
-    dispatch({
-      type: "ADD_ITEM",
-      payload: product,
-    });
+    try {
+      const response = await api.get("/cart");
+
+      dispatch({
+        type: "SET_CART",
+        payload: mapCartItems(
+          response.data.cart?.items
+        ),
+      });
+    } catch (error) {
+      console.error("Fetch cart error:", error);
+    }
+  }, []);
+
+  // Load cart when provider mounts
+  useEffect(() => {
+    fetchCart();
+  }, [fetchCart]);
+
+  // Add product to backend cart
+  const addToCart = async (product) => {
+    if (!localStorage.getItem("token")) {
+      throw new Error("Please login to add products to cart.");
+    }
+
+    try {
+      const response = await api.post("/cart", {
+        productId: Number(product.id),
+        quantity: 1,
+      });
+
+      dispatch({
+        type: "SET_CART",
+        payload: mapCartItems(
+          response.data.cart.items
+        ),
+      });
+
+      return true;
+    } catch (error) {
+      console.error("Add to cart error:", error);
+      throw error;
+    }
   };
 
+  // Local quantity operations
   const increaseQuantity = (productId) => {
     dispatch({
       type: "INCREASE_QUANTITY",
@@ -133,6 +145,7 @@ export const CartProvider = ({ children }) => {
     });
   };
 
+  // Local remove operation
   const removeFromCart = (productId) => {
     dispatch({
       type: "REMOVE_ITEM",
@@ -140,6 +153,7 @@ export const CartProvider = ({ children }) => {
     });
   };
 
+  // Local clear operation
   const clearCart = () => {
     dispatch({
       type: "CLEAR_CART",
@@ -158,7 +172,8 @@ export const CartProvider = ({ children }) => {
   const subtotal = useMemo(
     () =>
       state.items.reduce(
-        (total, item) => total + item.price * item.quantity,
+        (total, item) =>
+          total + item.price * item.quantity,
         0
       ),
     [state.items]
@@ -175,6 +190,7 @@ export const CartProvider = ({ children }) => {
         decreaseQuantity,
         removeFromCart,
         clearCart,
+        fetchCart,
       }}
     >
       {children}
